@@ -1,6 +1,8 @@
 // ignore_for_file: unnecessary_new, prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import "package:flutter/material.dart";
+import 'package:url_launcher/url_launcher.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -26,8 +28,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 print('ThreeDots');
               }),
         ]),
-        body: ListView(
-          children: [
+        body: ListView(children: [
           Image(
             image: AssetImage('assets/images/nazim_profile.jpg'),
             fit: BoxFit.fitWidth,
@@ -35,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
             // height: 300,
           ),
           Padding(
-            padding: const EdgeInsets.only(left:20),
+            padding: const EdgeInsets.only(left: 20),
             child: Text(
               "Mohd Nazim",
               style: TextStyle(
@@ -51,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(left:20),
+            padding: const EdgeInsets.only(left: 20),
             child: Text("Software Developer",
                 style: TextStyle(
                     fontSize: 20,
@@ -64,7 +65,6 @@ class _MyHomePageState extends State<MyHomePage> {
                           blurRadius: 10)
                     ])),
           ),
-          
           Divider(),
           Row(mainAxisAlignment: MainAxisAlignment.start, children: [
             Icon(Icons.local_phone, size: 30, color: Colors.purple),
@@ -93,14 +93,68 @@ class _MyHomePageState extends State<MyHomePage> {
               "Rz-536/24 Tughlakabad Extn New Delhi-110019",
               style: TextStyle(fontSize: 15, fontWeight: FontWeight.w100),
             )
-          ]),
-          IconButton(
-              onPressed: () {
-                print("shared");
-              },
-              icon: Icon(Icons.share),
-              color: Colors.purple,
-              )
-        ]));
+          ])
+        ]),
+        bottomNavigationBar: buildSocialButtons());
   }
 }
+
+Widget buildSocialButtons() => Card(
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      buildSocialButton(
+        icon: FontAwesomeIcons.facebookSquare,
+        color: Color(0xFF0075FC),
+        onClicked: () => share(SocialMedia.facebook),
+      ),
+      buildSocialButton(
+        icon: FontAwesomeIcons.linkedin,
+        color: Color(0xFF0072b1),
+        onClicked: () => share(SocialMedia.linkedin),
+      ),
+      buildSocialButton(
+          icon: FontAwesomeIcons.twitter,
+          color: Color(0xFF1da1f2),
+          onClicked: () => share(SocialMedia.twitter)),
+      buildSocialButton(
+          icon: FontAwesomeIcons.envelope,
+          color: Colors.black,
+          onClicked: () => share(SocialMedia.email)),
+      buildSocialButton(
+          icon: FontAwesomeIcons.whatsapp,
+          color: Colors.green,
+          onClicked: () => share(SocialMedia.whatsapp))
+    ]));
+
+Future share(SocialMedia platform) async {
+  final text = "My business Card";
+  final subject = "Business Card";
+  final urlShare = Uri.encodeComponent("nazim9873@gmail.com");
+  final urls = {
+    SocialMedia.facebook:
+        ('https://www.facebook.com/sharer/sharer.php?u=$urlShare'),
+    SocialMedia.twitter:
+        ('https://twitter.com/intent/tweet?url=$urlShare&text=$text'),
+    SocialMedia.linkedin:
+        ('https://www.linkedin.com/shareArticle?mini=true&url=$urlShare&title=$subject&summary=$text&source='),
+    SocialMedia.whatsapp:
+        ('https://api.whatsapp.com/send?text=$text%0a$urlShare'),
+    SocialMedia.email: ('mailto:?&subject=$subject&body=$urlShare')
+  };
+  final url = urls[platform]!;
+  await launch(url);
+}
+
+enum SocialMedia { facebook, twitter, linkedin, email, whatsapp }
+
+Widget buildSocialButton(
+        {required IconData icon,
+        Color? color,
+        required Function() onClicked}) =>
+    InkWell(
+      child: Container(
+        width: 60,
+        height: 60,
+        child: Center(child: FaIcon(icon, color: color, size: 40)),
+      ),
+      onTap: onClicked,
+    );
